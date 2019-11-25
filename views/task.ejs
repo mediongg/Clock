@@ -1,0 +1,39 @@
+<% timers.forEach((item) => { %>
+    <div
+        class="item"
+    >
+        <span
+         class="hint"
+        <% if (item.color) { %>
+        style="background-color:
+        rgba(
+        <%- parseInt(item.color.substring(0, 2), 16) %>,
+        <%- parseInt(item.color.substring(2, 4), 16) %>,
+        <%- parseInt(item.color.substring(4, 6), 16) %>
+        )"
+        <% } %>
+        >
+
+        </span>
+        <span class="ui teal label content">
+            開始
+            <div class="detail"><%- item.start %></div>
+        </span>
+        <span class="ui orange label content">
+            結束
+            <div class="detail"><%- item.end %></div>
+        </span>
+        <span class="content">
+            <button
+                class="ui primary button task-finish"
+                data-id="<%- item.id %>"
+                data-note="<%- item.note %>"
+            >
+                Finish
+            </button>
+            <button class="ui negative button task-del" data-id="<%- item.id %>">
+                Delete
+            </button>
+        </span>
+    </div>
+<% }) %>
