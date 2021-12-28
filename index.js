@@ -16,54 +16,8 @@ const upload = multer({
     })
 });
 const port = 3000;
-const CronJob = require('cron').CronJob;
 const sequelize = require('./dbschema/model.js');
 
-new CronJob('5 0 0 * * *', () => {
-    const Timer = sequelize.models.timer;
-    const today = new Date();
-    today.setDate(today.getDate() - 1);
-    const start = new Date(today);
-    const end = new Date(today);
-    start.setHours(0, 0, 0, 0);
-    end.setHours(23, 59, 59, 0);
-
-    sequelize.transaction({
-        isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE
-    }).then((t) => {
-        Timer.findAll({
-            transaction: t,
-            where: {
-                deleted: false,
-                createdAt: {
-                    [Sequelize.Op.between]: [start, end],
-                },
-            }
-        }).then((timers) => {
-            const promise = [];
-            timers.forEach((time) => {
-                const p = time
-                    .update({
-                        deleted: true,
-                    }, { transaction: t })
-                    .then((deleted) => {
-                        return Timer.create({
-                            start: deleted.start,
-                            end: deleted.end,
-                            color: deleted.color,
-                        }, { transaction: t });
-                    });
-                promise.push(p);
-            });
-            Promise.all(promise)
-                .then(() => {
-                    t.commit();
-                }).catch(() => {
-                    t.rollback();
-                });
-        });
-    });
-}, null, true, 'Asia/Taipei');
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'));
 
